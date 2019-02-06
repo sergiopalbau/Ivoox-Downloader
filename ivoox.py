@@ -11,9 +11,16 @@ def new_bs(url):
 
 def get_urls_page(soup: bs4.BeautifulSoup):
     ans = []
+    global title
     rect = soup.find_all("p", "title-wrapper text-ellipsis-multiple")
+    #print ("*************************")
+    #print (rect)
     for r in rect:
         ans += [r.find('a').get('href')]
+        title +=[r.find('a').get('title')]
+    print ("*************************\n")
+    print (title)
+    print ("*************************\n")
     return ans
 
 
@@ -68,10 +75,11 @@ def format_n(n):
 
 
 if __name__ == '__main__':
+    title = []
     # Lectura
     parser = argparse.ArgumentParser()
     parser.add_argument("url", type=str, help="url of audio")
-    parser.add_argument("name", type=str, help="name of audio")
+    #parser.add_argument("name", type=str, help="name of audio")
     parser.add_argument("path", type=str, help="path to save")
     parser.add_argument("-r", "--reversed",
                         action="store_true", dest="rev", default=False,
@@ -80,22 +88,24 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     url_r = args.url
-    name = args.name
-    download_path = os.path.join(args.path, name)
+    #name = args.name
+    #download_path = os.path.join(args.path, name)
+    download_path = os.path.join(args.path)
     rev = args.rev
 
     if not os.path.exists(download_path):
         os.makedirs(download_path)
 
-    print("Getting urls")
+    print("Getting urls##########################################################")
     links = get_download_urls(url_r)
 
     if not rev:
         links = links[::-1]
 
-    print("Start Download")
+    print("Start Download#######################################################")
     for i, _url in enumerate(links):
-        local_filename = os.path.join(download_path, f"{name}_{format_n(i+1)}.mp3")
+        #local_filename = os.path.join(download_path, f"{name}_{format_n(i+1)}_{title[i]}.mp3")
+        local_filename = os.path.join(download_path, f"{title[i]}.mp3")
         print(_url)
         req = requests.get(_url, stream=True)
         with open(local_filename, 'wb') as f:
